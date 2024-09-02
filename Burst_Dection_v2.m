@@ -1,34 +1,56 @@
 % 1. Import data
-data = readtable('/MATLAB Drive/energy_frequency_data_channel1_test1_SRUKF.xlsx');
+data = readtable('/MATLAB Drive/energy_frequency_data_channel2_test1_SRUKF.xlsx');
 % Extract required columns
 time = data.Time; % Assuming 'Time' is the column name in the table
-time = time(end-100:end);
+%time = time(100:500);
 total_energy = data.TotalEnergy;
-total_energy = total_energy(end-100:end);
+%total_energy = total_energy(100:500);
 % Ensure time is in datetime format
 if ~isdatetime(time)
     time = datetime(time, 'InputFormat', 'yyyy-MM-dd HH:mm:ss'); % Adjust based on actual format
 end
 
-% Define RI calculation related functions
-fir_filter = [-1 -1 -1 1 1 1];
+% Define window size
+window_size = 7;
 
-% Modify RI calculation related functions
-function g = weighting_function(n)
-    weights = exp(-0.8 * (n-1));
-    g = weights / sum(weights);
+% New weighting function
+function weights = new_weighting_function()
+    % Define parameters for exponential decay function
+    B = 0.3; % Increase decay rate to reduce weight sum of first 3 points
+    n = 0:5; % Index array (6 points)
+    % Calculate unnormalized weights
+    unnormalized_weights = exp(-B * n);
+    % Normalize weights
+    weights = unnormalized_weights / sum(unnormalized_weights);
+    % Check sum of weights for first 3 points
+    front_sum = sum(weights(1:3));
+    fprintf('Sum of weights for first 3 points: %.4f\n', front_sum);
 end
 
+% Modified scaling function
 function s = scaling_function(x)
+    if numel(x) > 1
+        warning('Input to scaling_function is not a scalar. Using mean value.');
+        x = mean(x);
+    end
     s = 100 / (1 + exp(-0.8 * x));
 end
 
+% Modified RI calculation function
 function RI = calculate_RI_new(log_energies)
-    % Calculate short-term and long-term energy change rates
+    % Get weights
+    weights = new_weighting_function();
+    % Ensure correct length of log_energies
+    if length(log_energies) ~= 7
+        error('log_energies must have length 7');
+    end
+    % Calculate short-term energy change rate
     short_term_change = log_energies(end) - log_energies(end-1);
-    long_term_change = log_energies(end) - mean(log_energies(1:end-1));
+    % Calculate weighted long-term energy change rate
+    long_term_changes = log_energies(end) - log_energies(1:end-1);
+    weighted_long_term_change = sum(weights .* long_term_changes);
     % Calculate weighted average change rate
-    weighted_change = 0.7 * short_term_change + 0.3 * long_term_change;
+    weighted_change = 0.7 * short_term_change + 0.3 * weighted_long_term_change;
     % Map to RI value
     RI = scaling_function(weighted_change);
 end
@@ -40,7 +62,6 @@ log_total_energy = log10(total_energy);
 ri_values = zeros(size(log_total_energy));
 
 % Calculate RI values
-window_size = 4; % Reduce window size to improve response speed
 for i = window_size:length(log_total_energy)
     window_energies = log_total_energy(i-window_size+1:i);
     ri_values(i) = calculate_RI_new(window_energies);
@@ -51,9 +72,6 @@ time = time(window_size:end);
 total_energy = total_energy(window_size:end);
 log_total_energy = log_total_energy(window_size:end);
 ri_values = ri_values(window_size:end);
-
-% Convert total energy to logarithmic scale
-log_total_energy = log10(total_energy);
 
 % Plotting
 figure;
@@ -66,9 +84,9 @@ grid on;
 
 subplot(2,1,2);
 plot(time, ri_values);
-title('Responsiveness Index (RI) Over Time');
+title('Burst Index (BI) Over Time');
 xlabel('Time');
-ylabel('RI Value');
+ylabel('BI Value');
 ylim([0 100]);
 grid on;
 
