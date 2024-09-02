@@ -45,7 +45,7 @@ signal = filtfilt(d, double(signal));
 
 % SR-UKF parameters
 n = 2; % State dimension (amplitude and amplitude difference)
-m = 2; % Measurement dimension (now observing both amplitude and difference)
+m = 2; % Measurement dimension 
 alpha = 1e-3;
 ki = 0;
 beta = 2;
@@ -105,7 +105,7 @@ for k = 1:length(signal)
     S_pred = S_pred(1:n, 1:n);  % Ensure S_pred is square
     
     % Measurement update
-    Z = X_pred; % Now we observe both states
+    Z = X_pred; % 
     z_pred = sum(Wm .* Z, 2);
     
     % Calculate innovation square root of covariance
