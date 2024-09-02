@@ -1,7 +1,7 @@
 % 1. Import data
 data = readtable('/MATLAB Drive/energy_frequency_data_channel2_test1_SRUKF.xlsx');
 % Extract required columns
-time = data.Time; % Assuming 'Time' is the column name in the table
+time = data.Time; 
 %time = time(100:500);
 total_energy = data.TotalEnergy;
 %total_energy = total_energy(100:500);
@@ -13,7 +13,7 @@ end
 % Define window size
 window_size = 7;
 
-% New weighting function
+% weighting function
 function weights = new_weighting_function()
     % Define parameters for exponential decay function
     B = 0.3; % Increase decay rate to reduce weight sum of first 3 points
@@ -90,7 +90,7 @@ ylabel('BI Value');
 ylim([0 100]);
 grid on;
 
-% Export data to Excel, including logarithmic energy
+% Export data to Excel
 data_to_export = table(time, total_energy, log_total_energy, ri_values, ...
     'VariableNames', {'Time', 'TotalEnergy', 'LogTotalEnergy', 'RI_Value'});
 writetable(data_to_export, 'ri_data_output.xlsx');
