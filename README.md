@@ -9,3 +9,7 @@
 ## Data Privacy Notice
 
 Due to the sensitive nature of the sleep and clinical anesthesia data used in this project, the raw data files are not included in this repository. 
+
+## File Anonymization
+
+All filenames in this project have been anonymized to protect subject privacy. The anonymization process ensures that no personally identifiable information can be derived from the filenames. 
