@@ -1,5 +1,5 @@
 % File path
-file_path = 'OM_406304942024.06.11_09.08.59.hdf5';
+file_path = '....hdf5';
 % Open the HDF5 file
 file_info = h5info(file_path);
 % Get information about the RawData/Samples dataset
