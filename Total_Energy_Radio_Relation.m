@@ -1,5 +1,5 @@
 % Import data
-data = readtable('energy_frequency_data_night2_222.xlsx');
+data = readtable('energy_frequency_data_night2.xlsx');
 
 % Extract required columns
 time = data.Time;
