@@ -14,7 +14,7 @@ channel_2_data = samples_data_transposed(:, 2); % Data from the second channel
 % Rename signal data
 signal = channel_2_data;
 % Sampling frequency
-Fs = 4800; % in Hz (since time vector t is in seconds and increments by 0.001)
+Fs = 4800; % in Hz 
 
 %% Design and apply notch filters for 50 Hz and its harmonics
 notch_freqs     = 50:50:200; % Frequencies to notch out (50 Hz, 100 Hz, 150 Hz, 200Hz)
